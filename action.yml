@@ -1,0 +1,99 @@
+name: 'Setup Homework'
+description: 'Setup homework for Github Classroom autograder'
+
+inputs:
+  min_commits:
+    description: 'Minimum number of commits required to earn credit'
+    required: true
+    default: 3
+
+outputs:
+  homework_name:
+    description: 'Name of homework parsed from repository name'
+    value: ${{ steps.parse-name.outputs.homework_name }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Parse Homework Name
+      id: parse-name
+      shell: bash
+      run: |
+        echo ""
+        echo "Working: $(pwd)"
+        echo "Repository: ${GITHUB_REPOSITORY}"
+        echo "MIN_COMMITS=${{ inputs.min_commits }}" >> $GITHUB_ENV
+
+        if [[ ${GITHUB_REPOSITORY} =~ .+\/homework-([^-]+)-.+ ]]; then
+          export HOMEWORK_NAME=${BASH_REMATCH[1]}
+          echo "Homework Name: ${HOMEWORK_NAME}"
+          echo "HOMEWORK_NAME=${HOMEWORK_NAME}" >> $GITHUB_ENV
+          echo "::set-output name=homework_name::${HOMEWORK_NAME}"
+          exit 0
+        fi
+
+        echo "::error ::Repository ${GITHUB_REPOSITORY} in an unexpected format; cannot parse."
+
+    - name: Make Temporary Directory
+      id: make-temporary
+      shell: bash
+      run: |
+        TEMPLATE_DIR=$(mktemp -d ~/template-XXXX)
+        echo "Temporary Directory: ${TEMPLATE_DIR}"
+        echo "TEMPLATE_DIR=${TEMPLATE_DIR}" >> $GITHUB_ENV
+
+    - name: Checkout Template Repository
+      id: checkout-template
+      shell: bash
+      run: |
+        TEMPLATE_REPO="https://github-actions:${{ github.token }}@github.com/${{ github.repository_owner }}/homework-${HOMEWORK_NAME}-template.git"
+        git clone --depth 1 "${TEMPLATE_REPO}" ${TEMPLATE_DIR}/template
+
+    - name: Setup Clean Test Environment
+      id: setup-test
+      shell: bash
+      run: |
+        echo ""
+        echo "Template Tests:"
+        ls -CGR ${TEMPLATE_DIR}/template/src/test/
+        rm -rf src/test
+        mv -fv ${TEMPLATE_DIR}/template/src/test src/
+        mv -fv ${TEMPLATE_DIR}/template/pom.xml .
+
+        echo ""
+        echo "Copied Tests:"
+        ls -CGR src/test/
+
+    # do this before so the NUM_COMMITS is properly substituted
+    # in the next step
+
+    - name: Check Commit Count
+      id: check-commits
+      shell: bash
+      run: |
+        echo ""
+        echo "Checking Commits..."
+        git fetch --unshallow
+        NUM_COMMITS=$(git rev-list --count refs/remotes/origin/main)
+
+        echo "NUM_COMMITS=${NUM_COMMITS}" >> $GITHUB_ENV
+        echo "Looked for ${COMMIT_COUNT} commits; found ${NUM_COMMITS}; ${MIN_COMMITS} required."
+
+    # have to substitute all environment varaibles into the command files
+    # since the autograder cannot access environment variables itself
+
+    - name: Setup Test Commands
+      id: setup-commands
+      shell: bash
+      run: |
+        echo ""
+        echo "Test Commands:"
+        cp ${{ github.action_path }}/*.sh .
+        ls -aCG *.sh
+        for command_file in *.sh; do
+          envsubst < ${command_file} > ${command_file}.txt
+          mv ${command_file}.txt ${command_file}
+          echo ""
+          echo "Updated: ${command_file}"
+          cat ${command_file}
+        done
