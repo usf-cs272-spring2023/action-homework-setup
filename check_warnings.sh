@@ -6,7 +6,8 @@ mvn -f pom.xml -ntp "-DcompileOptionXlint=-Xlint:all" "-DcompileOptionXdoclint=-
 result=$?
 
 # add annotation if failed
-if [ -z "$result" ] && [ $result -ne 0 ] then
+if [ -n "$result" ] && [ $result -ne 0 ]; then
   echo "Hello world"
+fi
 
 exit $result
