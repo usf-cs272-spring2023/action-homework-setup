@@ -5,10 +5,8 @@ export JAVA_HOME="${JAVA_HOME}"
 mvn -f pom.xml -ntp "-DcompileOptionXlint=-Xlint:all" "-DcompileOptionXdoclint=-Xdoclint:all/private" "-DcompileOptionFail=true" "-Dmaven.compiler.showWarnings=true" clean compile
 result=$?
 
-echo "The status: $result"
-
 # add annotation if failed
-if [ "$result" -ne 0 ]; then
+if [[ -z "$result" && $result -ne 0 ]]; then
   echo "Hello world"
 fi
 
