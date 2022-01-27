@@ -6,7 +6,7 @@ mvn -f pom.xml -ntp "-DcompileOptionXlint=-Xlint:all" "-DcompileOptionXdoclint=-
 status=$?
 
 # add annotation if failed
-if [ $status -ne 0 ]; then
+if [ "$status" -ne 0 ]; then
   echo "Hello world"
 fi
 
