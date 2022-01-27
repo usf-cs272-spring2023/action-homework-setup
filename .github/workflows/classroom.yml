@@ -1,8 +1,5 @@
 name: GitHub Classroom Workflow
 
-# the autograder action does not have access to environment variables
-# the autograder action does not seem to use the maven cache
-
 on:
   push:
     branches: [main]
@@ -15,8 +12,9 @@ jobs:
     name: Autograding
     runs-on: ubuntu-latest
     timeout-minutes: 10
+
     outputs:
-      homework_name: ${{ steps.setup.output.homework_name }}
+      homework_name: ${{ steps.setup-homework.output.homework_name }}
       points: ${{ steps.autograder.outputs.points }}
       outcome: ${{ steps.autograder.outcome }}
 
@@ -24,20 +22,36 @@ jobs:
       - name: Checkout Homework Repository
         uses: actions/checkout@v2
 
-      - name: Setup Homework Test Environment
-        id: setup
-        uses: usf-cs272-spring2022/action-homework-setup@main
-
+      # the autograder action does not seem to use the maven cache
       - name: Setup Java JDK 17
+        id: setup-java
         uses: actions/setup-java@v2
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: 'maven'
 
+      # the autograder action does not have access to environment variables
+      # the setup action hard-codes those values where needed
+      - name: Setup Homework Test Environment
+        id: setup-homework
+        uses: usf-cs272-spring2022/action-homework-setup@main
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+
       - name: Run Autograder
         id: autograder
         uses: education/autograding@v1
+
+      # check_warnings script creates found_compile_warnings file
+      # if unable to compile without warnings
+      - name: Check Autograder Status
+        if: ${{ failure() }}
+        run: |
+          if [[ -f "found_compile_warnings" ]];
+          then
+            echo "::warning::Unable to compiling code without warnings. Open the \"Run Autograder\" section in the log and go to the \"Check Warnings\" test for details."
+          fi
 
   # make points badge for readme
   # https://github.com/markpatterson27/points-bar
