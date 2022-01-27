@@ -7,7 +7,7 @@ mvn -f pom.xml -ntp "-DcompileOptionXlint=-Xlint:all" "-DcompileOptionXdoclint=-
 
 if [[ $? -ne 0 ]];
 then
-  echo "::warning ::Unable to compiling code without warnings. See the \"Check Warnings\" section in the run log for details."
+  echo "::warning file=.github,line=1,col=1::Unable to compiling code without warnings. See the \"Check Warnings\" section in the run log for details."
   exit 1;
 fi
 
