@@ -7,8 +7,8 @@ mvn -f pom.xml -ntp "-DcompileOptionXlint=-Xlint:all" "-DcompileOptionXdoclint=-
 
 if [[ $? -ne 0 ]];
 then
+  echo "Found compile warnings!"
   export COMPILE_WARNING="true"
-  echo "COMPILE_WARNING=true" >> $GITHUB_ENV
 fi
 
 exit 0;
