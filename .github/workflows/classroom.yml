@@ -13,7 +13,6 @@ jobs:
     timeout-minutes: 10
 
     outputs:
-      homework_name: ${{ steps.setup-homework.output.homework_name }}
       points: ${{ steps.autograder.outputs.points }}
       outcome: ${{ steps.autograder.outcome }}
 
@@ -22,13 +21,13 @@ jobs:
         uses: actions/checkout@v2
 
       # the autograder action does not seem to use the maven cache
-      - name: Setup Java JDK 17
-        id: setup-java
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'maven'
+      # - name: Setup Java JDK 17
+      #   id: setup-java
+      #   uses: actions/setup-java@v2
+      #   with:
+      #     distribution: 'temurin'
+      #     java-version: '17'
+      #     cache: 'maven'
 
       # the autograder action does not have access to environment variables
       # the setup action hard-codes those values where needed
@@ -93,6 +92,12 @@ jobs:
           echo "![Points](points.svg)" >> README.md
           echo "${{ needs.grade.outputs.points }}" >> points.txt
 
+      - name: Upload Points Text
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'points.txt'
+          path: 'points.txt'
+
       - name: Generate Points Badge
         uses: emibcn/badge-action@v1.2.1
         with:
@@ -101,18 +106,12 @@ jobs:
           color: '${{ steps.results.outputs.color }}'
           path: 'points.svg'
 
-      - name: Upload Results
-        uses: actions/upload-artifact@v2
-        with:
-          path: |
-           'points.txt'
-           'points.svg'
-
       - name: Push Points Badge
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add points.svg
+          git add points.txt
           git add README.md
           git commit --allow-empty -m "Updated points badge"
           git push origin badges --force

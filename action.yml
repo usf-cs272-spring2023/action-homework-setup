@@ -79,6 +79,14 @@ runs:
         echo "NUM_COMMITS=${NUM_COMMITS}" >> $GITHUB_ENV
         echo "Looked for ${COMMIT_COUNT} commits; found ${NUM_COMMITS}; ${MIN_COMMITS} required."
 
+    - name: Setup Java JDK 17
+      id: setup-java
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        cache: 'maven'
+
     # have to substitute all environment varaibles into the command files
     # since the autograder cannot access environment variables itself
 
@@ -97,3 +105,15 @@ runs:
           echo "Updated: ${command_file}"
           cat ${command_file}
         done
+
+    # add annotation if compile warnings
+    # do this here since autograding action does not allow workflow commands
+    - name: Check Warnings
+      id: check-warn
+      shell: bash
+        bash check_warnings.sh
+
+        if [[ $? -ne 0]];
+        then
+          echo "::warning::Unable to compiling code without warnings. Open the \"Run Autograder\" section in the log and go to the \"Check Warnings\" test for details."
+        fi
