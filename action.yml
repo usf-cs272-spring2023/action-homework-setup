@@ -121,7 +121,8 @@ runs:
         bash check_warnings.sh
 
     - name: Add Warning Annotation
-      if: ${{ env.COMPILE_WARNING == 'true' }}
+      # if: ${{ env.COMPILE_WARNING == 'true' }}
       shell: bash
       run: |
+        echo "${COMPILE_WARNING}"
         echo "::warning::Unable to compiling code without warnings. Open the \"Run Autograder\" section in the log and go to the \"Check Warnings\" test for details."
