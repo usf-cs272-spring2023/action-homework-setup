@@ -5,10 +5,9 @@ on:
     branches: [main]
 
 jobs:
-  # standard autograder java setup
   # separate job so status of autograder affects status of job
   # without having to use continue-on-error and allowing concurrent followup jobs
-  build:
+  grade:
     name: Autograding
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -39,6 +38,7 @@ jobs:
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
 
+      # autograder stops commands while running
       - name: Run Autograder
         id: autograder
         uses: education/autograding@v1
@@ -46,7 +46,7 @@ jobs:
       # check_warnings script creates found_compile_warnings file
       # if unable to compile without warnings
       - name: Check Autograder Status
-        if: ${{ failure() }}
+        if: ${{ always() }}
         run: |
           if [[ -f "found_compile_warnings" ]];
           then
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     if: always()
-    needs: build
+    needs: grade
     outputs:
       color: ${{ steps.results.outputs.color }}
 
@@ -71,7 +71,7 @@ jobs:
       - name: Check Result
         id: results
         run: |
-          outcome="${{ needs.build.outputs.outcome }}"
+          outcome="${{ needs.grade.outputs.outcome }}"
           color="f85149"
 
           if [[ $outcome == "success" ]]; then
@@ -91,14 +91,22 @@ jobs:
           git rm --cached $(git ls-files)
           echo "# Badges branch" > README.md
           echo "![Points](points.svg)" >> README.md
+          echo "${{ needs.grade.outputs.points }}" >> points.txt
 
       - name: Generate Points Badge
         uses: emibcn/badge-action@v1.2.1
         with:
           label: 'Points'
-          status: '${{ needs.build.outputs.points }}'
+          status: '${{ needs.grade.outputs.points }}'
           color: '${{ steps.results.outputs.color }}'
           path: 'points.svg'
+
+      - name: Upload Results
+        uses: actions/upload-artifact@v2
+        with:
+          path: |
+           'points.txt'
+           'points.svg'
 
       - name: Push Points Badge
         run: |
