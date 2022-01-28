@@ -38,6 +38,9 @@ runs:
 
         echo "::error ::Repository ${GITHUB_REPOSITORY} in an unexpected format; cannot parse."
 
+    - name: Checkout Homework Repository
+      uses: actions/checkout@v2
+
     - name: Make Temporary Directory
       id: make-temporary
       shell: bash
