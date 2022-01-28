@@ -120,8 +120,8 @@ runs:
       run: |
         bash check_warnings.sh
 
-    # - name: Add Warning Annotation
-    #   if: ${{ failure() }}
-    #   shell: bash
-    #   run: |
-    #     echo "::warning::Unable to compiling code without warnings. Open the \"Run Autograder\" section in the log and go to the \"Check Warnings\" test for details."
+    - name: Add Warning Annotation
+      if: ${{ env.COMPILE_WARNING == "true" }}
+      shell: bash
+      run: |
+        echo "::warning::Unable to compiling code without warnings. Open the \"Run Autograder\" section in the log and go to the \"Check Warnings\" test for details."
