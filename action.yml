@@ -114,7 +114,7 @@ runs:
       id: check-warning
       shell: bash
       run: |
-        bash check_warnings.sh
+        mvn -f pom.xml -ntp "-DcompileOptionXlint=-Xlint:all" "-DcompileOptionXdoclint=-Xdoclint:all/private" "-DcompileOptionFail=true" "-Dmaven.compiler.showWarnings=true" clean compile
 
         if [[ $? -ne 0]];
         then
