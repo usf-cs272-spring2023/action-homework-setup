@@ -64,6 +64,16 @@ runs:
         echo "Copied Tests:"
         ls -CGR src/test/
 
+    # if made it this far, setup java
+
+    - name: Setup Java JDK 17
+      id: setup-java
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        cache: 'maven'
+
     # do this before so the NUM_COMMITS is properly substituted
     # in the next step
 
