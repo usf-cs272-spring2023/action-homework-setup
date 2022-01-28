@@ -110,3 +110,6 @@ runs:
         then
           echo "::warning::Unable to compiling code without warnings. Open the \"Run Autograder\" section in the log and go to the \"Check Warnings\" test for details."
         fi
+
+        echo "[done]"
+        exit 0
