@@ -120,6 +120,10 @@ runs:
       run: |
         bash check_warnings.sh
 
+        echo "Done"
+        echo "${COMPILE_WARNING}"
+        
+
         if [[ ${COMPILE_WARNING} == "true" ]];
         then
           echo "::warning::Unable to compiling code without warnings. Open the \"Run Autograder\" section in the log and go to the \"Check Warnings\" test for details."
