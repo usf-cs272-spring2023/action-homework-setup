@@ -119,11 +119,15 @@ runs:
       shell: bash
       run: |
         bash check_warnings.sh
-        echo "Hi ${COMPILE_WARNING}"
 
-    - name: Add Warning Annotation
-      # if: ${{ env.COMPILE_WARNING == 'true' }}
-      shell: bash
-      run: |
-        echo "Hi ${COMPILE_WARNING}"
-        echo "::warning::Unable to compiling code without warnings. Open the \"Run Autograder\" section in the log and go to the \"Check Warnings\" test for details."
+        if [[ ${COMPILE_WARNING} == "true" ]];
+        then
+          echo "::warning::Unable to compiling code without warnings. Open the \"Run Autograder\" section in the log and go to the \"Check Warnings\" test for details."
+        fi
+
+    # - name: Add Warning Annotation
+    #   # if: ${{ env.COMPILE_WARNING == 'true' }}
+    #   shell: bash
+    #   run: |
+    #     echo "Hi ${COMPILE_WARNING}"
+    #     echo "::warning::Unable to compiling code without warnings. Open the \"Run Autograder\" section in the log and go to the \"Check Warnings\" test for details."
