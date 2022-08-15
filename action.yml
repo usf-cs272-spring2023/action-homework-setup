@@ -39,7 +39,7 @@ runs:
         echo "::error ::Repository ${GITHUB_REPOSITORY} in an unexpected format; cannot parse."
 
     - name: Checkout Homework Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Make Temporary Directory
       id: make-temporary
@@ -75,7 +75,7 @@ runs:
 
     - name: Setup Java JDK 17
       id: setup-java
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: '17'
