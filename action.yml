@@ -32,7 +32,7 @@ runs:
           export HOMEWORK_NAME=${BASH_REMATCH[1]}
           echo "Homework Name: ${HOMEWORK_NAME}"
           echo "HOMEWORK_NAME=${HOMEWORK_NAME}" >> $GITHUB_ENV
-          echo "::set-output name=homework_name::${HOMEWORK_NAME}"
+          echo "homework_name=${HOMEWORK_NAME}" >> $GITHUB_OUTPUT
           exit 0
         fi
 
