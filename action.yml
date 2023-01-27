@@ -94,7 +94,7 @@ runs:
         NUM_COMMITS=$(git rev-list --count refs/remotes/origin/main)
 
         echo "NUM_COMMITS=${NUM_COMMITS}" >> $GITHUB_ENV
-        echo "Looked for ${COMMIT_COUNT} commits; found ${NUM_COMMITS}; ${MIN_COMMITS} required."
+        echo "Found ${NUM_COMMITS} commits; ${MIN_COMMITS} required."
 
     # have to substitute all environment varaibles into the command files
     # since the autograder cannot access environment variables itself
